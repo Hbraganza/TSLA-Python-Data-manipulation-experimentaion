@@ -31,7 +31,7 @@ lags = [df['Close'].shift(lag) for lag in range(1, lag_features + 1)]
 # Combine lag features into a DataFrame
 lagged_df = pd.concat(lags, axis=1, keys=[f"Close_t-{lag}" for lag in range(1, lag_features + 1)])
 
-# Add a moving average (7-day window) as a feature
+# Add a moving average (7-day, 30-day & 100-day window) as a feature
 df['Close_MA7'] = df['Close'].rolling(window=7).mean()
 df['Close_MA30'] = df['Close'].rolling(window=30).mean()
 df['Close_MA100'] = df['Close'].rolling(window=100).mean()
@@ -61,8 +61,8 @@ if X.shape[0] == 0:
     print("Not enough data for training after creating lag features. Try reducing lag_features.")
     exit()
 
-# Chronological train-test split (80% train, 20% test)
-split_idx = int(len(X) * 0.99)
+# Chronological train-test split (80% train, 20% test) for the loss function calculation
+split_idx = int(len(X) * 0.80)
 X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
 y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
 
@@ -117,9 +117,9 @@ future_df = pd.DataFrame({'Date': future_dates, 'Predicted Close': future_predic
 
 # Plot the historical and future predictions
 plt.figure(figsize=(12, 8))
-plt.plot(df['Close_MA7'], label="Seven Day Average")
-plt.plot(df['Close_MA30'], label="Thirty Day Average")
-plt.plot(df['Close_MA100'], label="Hundred Day Average")
+plt.plot(df['Close_MA7'], label="Seven Day Average") #comparison
+plt.plot(df['Close_MA30'], label="Thirty Day Average") #comparison
+plt.plot(df['Close_MA100'], label="Hundred Day Average") #comparison
 plt.plot(df.index, df['Close'], label="Historical Close Prices", marker='o')
 plt.plot(future_df.index, future_df['Predicted Close'], label="Future Predicted Close Prices", marker='x')
 plt.xlabel("Date")
